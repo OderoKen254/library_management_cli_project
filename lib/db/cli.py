@@ -49,10 +49,31 @@ def book_menu():
             print("Exiting Books Menu")
             break
         else:
-            print("Invalid entry. Insert a choice between 1-6")
-
+            print("Invalid choice entry. Please try again.")
+    session.close()
 
 
 def borrower_menu():
+    session = Session()
     while True:
-        pass
+        print("\n======Borrower Management======")
+        print("1. Add Borrower")
+        print("2. Delete Borrower")
+        print("3. View All Borrowers")
+        print("4. Find Borrower by Name or Email")
+        print("5. Back")
+
+        choice = input("Select any options (1-5): ")
+        if choice == '1':
+            add_borrower(session)
+        elif choice == '2':
+            delete_borrower(session)
+        elif choice == '3':
+            view_all_borrowers(session)
+        elif choice == '4':
+            find_borrower(session)
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice entry. Please try again.")
+    session.close()
