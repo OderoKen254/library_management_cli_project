@@ -15,6 +15,7 @@ class Book(Base):
     isbn = Column(String, unique=True, nullable=False)
     publication_year = Column(Integer, nullable=False)
     borrower_id = Column(Integer, ForeignKey("borrowers.id"), nullable=True)
+    issued = Column(DateTime, nullable=True)
 
     #relationship
     borrower = relationship("Borrower", back_populates="books")
@@ -40,11 +41,52 @@ class Book(Base):
         elif not isbn.strip():
             raise ValueError("ISBN cannot be empty")
         return isbn
+    
+    @validates('borrower_id')
+    def validate_borrower_id(self, key, borrower_id):
+        if borrower_id is not None:
+            self.issued = datetime.now()
+        else:
+            self.issued = None
+        return borrower_id
+    
+    def __repr__(self):
+        return f"<Book(title='{self.title}', author='{self.author}', isbn='{self.isbn}', issued={self.issued})>"
 
 
 
 class Borrower(Base):
     __tablename__ = 'borrowers'
-    pass
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    phone = Column(String, nullable=True)
+
+    #Relationship
+    books = relationship("Book", back_populates="borrower")
+
+    #validators
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name or name.strip() == '':
+            raise ValueError("Name cannot be empty")
+        return name
+    
+    @validates('phone')
+    def validate_phone(self, key, phone):
+        if phone and not re.match(r'^\+?\d{10,15}$', phone):
+            raise ValueError("Invalid phone number format")
+        return phone
+    
+    @validates('email')
+    def validate_email(self, key, email):
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            raise ValueError("Invalid email format")
+        return email
+    
+
+    def __repr__(self):
+        return f"<Borrower(name='{self.name}', email='{self.email}')>"
 
 
