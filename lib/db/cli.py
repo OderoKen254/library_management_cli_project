@@ -79,13 +79,14 @@ def borrower_menu():
     session.close()
 
 
+# Book handling functions
 def add_book(session):
     try:
-        title = input("Enter book title: ")
-        author = input("Enter author: ")
-        isbn = input("Enter ISBN: ")
-        year = int(input("Enter publication year: "))
-        borrower_id = input("Enter borrower ID (leave blank if none): ")
+        title = input("Title: ")
+        author = input("Author: ")
+        isbn = input("ISBN: ")
+        year = int(input("Publication year: "))
+        borrower_id = input("Borrower ID (leave blank if none): ")
         borrower_id = int(borrower_id) if borrower_id else None
         if borrower_id:
             borrower = session.query(Borrower).get(borrower_id)
@@ -103,7 +104,7 @@ def add_book(session):
 
 def delete_book(session):
     try:
-        book_id = int(input("Enter book ID to delete: "))
+        book_id = int(input("Book ID to delete: "))
         book = session.query(Book).get(book_id)
         if book:
             session.delete(book)
@@ -125,7 +126,7 @@ def view_all_books(session):
         print("No books found.")
 
 def find_book(session):
-    search = input("Enter title or ISBN to search: ")
+    search = input("Enter title or ISBN: ")
     books = session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
     if books:
         for book in books:
@@ -137,7 +138,7 @@ def find_book(session):
 
 def view_borrowed_books(session):
     try:
-        borrower_id = int(input("Enter borrower ID: "))
+        borrower_id = int(input("Borrower ID: "))
         borrower = session.query(Borrower).get(borrower_id)
         if borrower:
             books = session.query(Book).filter(Book.borrower_id == borrower_id).all()
@@ -153,11 +154,12 @@ def view_borrowed_books(session):
         print(f"Error: {str(e)}")
 
 
+#Borrower/user handling functions
 def add_borrower(session):
     try:
-        name = input("Enter borrower name: ")
-        email = input("Enter email: ")
-        phone = input("Enter phone (optional): ") or None
+        name = input("Borrower name: ")
+        email = input("Email: ")
+        phone = input("Phone (optional): ") or None
         borrower = Borrower(name=name, email=email, phone=phone)
         session.add(borrower)
         session.commit()
@@ -169,7 +171,7 @@ def add_borrower(session):
 
 def delete_borrower(session):
     try:
-        borrower_id = int(input("Enter borrower ID to delete: "))
+        borrower_id = int(input("Borrower ID to delete: "))
         borrower = session.query(Borrower).get(borrower_id)
         if borrower:
             if borrower.books:
@@ -194,7 +196,7 @@ def view_all_borrowers(session):
 
 
 def find_borrower(session):
-    search = input("Enter name or email to search: ")
+    search = input("Name or email: ")
     borrowers = session.query(Borrower).filter((Borrower.name.ilike(f"%{search}%")) | (Borrower.email == search)).all()
     if borrowers:
         for borrower in borrowers:
