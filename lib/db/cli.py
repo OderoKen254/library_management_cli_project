@@ -17,13 +17,14 @@ def main_menu():
         elif choice == '2':
             borrower_menu()
         elif choice == '3':
-            print("Exiting...")
+            print("...Exiting library session. Goodbye!")
             break
         else:
             print("Invalid choice. Please try again.")
 
 
 def book_menu():
+    """Display book management sub-menu."""
     session = Session()
     while True:
         print("\n......Book Management.......")
@@ -54,6 +55,7 @@ def book_menu():
 
 
 def borrower_menu():
+    """Display borrower management sub-menu."""
     session = Session()
     while True:
         print("\n======Borrower Management======")
@@ -81,6 +83,7 @@ def borrower_menu():
 
 # Book handling functions
 def add_book(session):
+    """Add a new book with validation."""
     try:
         title = input("Title: ")
         author = input("Author: ")
@@ -103,6 +106,7 @@ def add_book(session):
 
 
 def delete_book(session):
+    """Delete a book by ID."""
     try:
         book_id = int(input("Book ID to delete: "))
         book = session.query(Book).get(book_id)
@@ -117,6 +121,7 @@ def delete_book(session):
 
 
 def view_all_books(session):
+    """Display all books."""
     books = session.query(Book).all()
     if books:
         for book in books:
@@ -126,6 +131,7 @@ def view_all_books(session):
         print("No books found.")
 
 def find_book(session):
+    """Find a book by title or ISBN."""
     search = input("Enter title or ISBN: ")
     books = session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
     if books:
@@ -137,6 +143,7 @@ def find_book(session):
 
 
 def view_borrowed_books(session):
+    """View books borrowed by a specific borrower."""
     try:
         borrower_id = int(input("Borrower ID: "))
         borrower = session.query(Borrower).get(borrower_id)
@@ -156,6 +163,7 @@ def view_borrowed_books(session):
 
 #Borrower/user handling functions
 def add_borrower(session):
+    """Add a new borrower with validation."""
     try:
         name = input("Borrower name: ")
         email = input("Email: ")
@@ -170,6 +178,7 @@ def add_borrower(session):
 
 
 def delete_borrower(session):
+    """Delete a borrower by ID."""
     try:
         borrower_id = int(input("Borrower ID to delete: "))
         borrower = session.query(Borrower).get(borrower_id)
@@ -187,6 +196,7 @@ def delete_borrower(session):
 
 
 def view_all_borrowers(session):
+    """Display all borrowers."""
     borrowers = session.query(Borrower).all()
     if borrowers:
         for borrower in borrowers:
@@ -196,6 +206,7 @@ def view_all_borrowers(session):
 
 
 def find_borrower(session):
+    """Find a borrower by name or email."""
     search = input("Name or email: ")
     borrowers = session.query(Borrower).filter((Borrower.name.ilike(f"%{search}%")) | (Borrower.email == search)).all()
     if borrowers:

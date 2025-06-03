@@ -5,6 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from model import Book, Borrower
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 from lib.models import Base
