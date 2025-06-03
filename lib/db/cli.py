@@ -1,7 +1,7 @@
 #CLI Interface and Menu Logic
 
 from database import Session
-from model import Book, Borrower
+from models import Book, Borrower
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 def main_menu():

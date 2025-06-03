@@ -1,6 +1,6 @@
 #Data models and validation logic
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, validates
 from database import Base
 import re
@@ -37,9 +37,7 @@ class Book(Base):
     @validates('isbn')
     def validate_isbn(self, key, isbn):
         if not re.match(r'^\d{10}|\d{13}$', isbn):
-            raise ValueError("ISBN must be 10 or 13 digits"):
-        elif not isbn.strip():
-            raise ValueError("ISBN cannot be empty")
+            raise ValueError("ISBN must be 10 or 13 digits")
         return isbn
     
     @validates('borrower_id')
