@@ -1,35 +1,37 @@
 #CLI Interface and Menu Logic
 
-from lib.database import Session
-from lib.db.models import Book, Borrower
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from lib.db.models import Book, Borrower, init_db, get_session
+from sqlalchemy.exc import IntegrityError
 
-class LibraryCLI:
+class CLI:
     def __init__(self):
+        #init_db()  # Initialize the database when the CLI starts
         self.session = get_session()
 
-    def main_menu():
+    def main_menu(self):
         while True:
             print("\n****Library Management System****")
             print("1. Manage Books")
             print("2. Manage Borrowers")
             print("3. Exit")
 
-            choice = ("Select an option (1-3): ")
+            choice = input("Select an option (1-3): ")
             if choice == '1':
-                book_menu()
+                self.book_menu()
             elif choice == '2':
-                borrower_menu()
+                self.borrower_menu()
             elif choice == '3':
                 print("...Exiting library session. Goodbye!")
+                self.session.close()
                 break
             else:
                 print("Invalid choice. Please try again.")
+            return
 
 
-    def book_menu():
+    def book_menu(self):
         """Display book management sub-menu."""
-        session = Session()
+       # session = Session()
         while True:
             print("\n......Book Management.......")
             print("1. Add Book")
@@ -41,26 +43,26 @@ class LibraryCLI:
             
             choice = input("Select an option (1-6): ")
             if choice == '1':
-                add_book(session)
+                self.add_book()
             elif choice == '2':
-                delete_book(session)
+                self.delete_book()
             elif choice == '3':
-                view_all_books(session)
+                self.view_all_books()
             elif choice == '4':
-                view_borrowed_book(session)
+                self.vself.iew_borrowed_book()
             elif choice == '5':
-                find_books(session)
+                self.find_books()
             elif choice == '6':
                 print("Exiting Books Menu")
                 break
             else:
                 print("Invalid choice entry. Please try again.")
-        session.close()
+        #session.close()
 
 
-    def borrower_menu():
+    def borrower_menu(self):
         """Display borrower management sub-menu."""
-        session = Session()
+       # session = Session()
         while True:
             print("\n======Borrower Management======")
             print("1. Add Borrower")
@@ -71,22 +73,22 @@ class LibraryCLI:
 
             choice = input("Select any options (1-5): ")
             if choice == '1':
-                add_borrower(session)
+                self.add_borrower()
             elif choice == '2':
-                delete_borrower(session)
+                self.delete_borrower()
             elif choice == '3':
-                view_all_borrowers(session)
+                self.view_all_borrowers()
             elif choice == '4':
-                find_borrower(session)
+                self.find_borrower()
             elif choice == '5':
                 break
             else:
                 print("Invalid choice entry. Please try again.")
-        session.close()
+        #session.close()
 
 
     # Book handling functions
-    def add_book(session):
+    def add_book(self):
         """Add a new book with validation."""
         try:
             title = input("Title: ")
@@ -96,27 +98,27 @@ class LibraryCLI:
             borrower_id = input("Borrower ID (leave blank if none): ")
             borrower_id = int(borrower_id) if borrower_id else None
             if borrower_id:
-                borrower = session.query(Borrower).get(borrower_id)
+                borrower = self.session.query(Borrower).get(borrower_id)
                 if not borrower:
                     print("Borrower not found!")
                     return
             book = Book(title=title, author=author, isbn=isbn, publication_year=year, borrower_id=borrower_id)
-            session.add(book)
-            session.commit()
+            self.session.add(book)
+            self.session.commit()
             print("Book added successfully!")
         except (ValueError, IntegrityError) as e:
-            session.rollback()
+            self.session.rollback()
             print(f"Error: {str(e)}")
 
 
-    def delete_book(session):
+    def delete_book(self):
         """Delete a book by ID."""
         try:
             book_id = int(input("Book ID to delete: "))
-            book = session.query(Book).get(book_id)
+            book = self.session.query(Book).get(book_id)
             if book:
-                session.delete(book)
-                session.commit()
+                self.session.delete(book)
+                self.session.commit()
                 print("Book deleted successfully!")
             else:
                 print("Book not found!")
@@ -124,9 +126,9 @@ class LibraryCLI:
             print(f"Error: {str(e)}")
 
 
-    def view_all_books(session):
+    def view_all_books(self):
         """Display all books."""
-        books = session.query(Book).all()
+        books = self.session.query(Book).all()
         if books:
             for book in books:
                 borrower = book.borrower.name if book.borrower else "None"
@@ -134,10 +136,10 @@ class LibraryCLI:
         else:
             print("No books found.")
 
-    def find_book(session):
+    def find_book(self):
         """Find a book by title or ISBN."""
         search = input("Enter title or ISBN: ")
-        books = session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
+        books = self.session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
         if books:
             for book in books:
                 borrower = book.borrower.name if book.borrower else "None"
@@ -146,13 +148,13 @@ class LibraryCLI:
             print("No books found.")
 
 
-    def view_borrowed_books(session):
+    def view_borrowed_books(self):
         """View books borrowed by a specific borrower."""
         try:
             borrower_id = int(input("Borrower ID: "))
-            borrower = session.query(Borrower).get(borrower_id)
+            borrower = self.session.query(Borrower).get(borrower_id)
             if borrower:
-                books = session.query(Book).filter(Book.borrower_id == borrower_id).all()
+                books = self.session.query(Book).filter(Book.borrower_id == borrower_id).all()
                 if books:
                     print(f"Books borrowed by {borrower.name}:")
                     for book in books:
@@ -166,32 +168,32 @@ class LibraryCLI:
 
 
     #Borrower/user handling functions
-    def add_borrower(session):
+    def add_borrower(self):
         """Add a new borrower with validation."""
         try:
             name = input("Borrower name: ")
             email = input("Email: ")
             phone = input("Phone (optional): ") or None
             borrower = Borrower(name=name, email=email, phone=phone)
-            session.add(borrower)
-            session.commit()
+            self.session.add(borrower)
+            self.session.commit()
             print("Borrower added successfully!")
         except (ValueError, IntegrityError) as e:
-            session.rollback()
+            self.session.rollback()
             print(f"Error: {str(e)}")
 
 
-    def delete_borrower(session):
+    def delete_borrower(self):
         """Delete a borrower by ID."""
         try:
             borrower_id = int(input("Borrower ID to delete: "))
-            borrower = session.query(Borrower).get(borrower_id)
+            borrower = self.session.query(Borrower).get(borrower_id)
             if borrower:
                 if borrower.books:
                     print("Cannot delete borrower with active loans!")
                     return
-                session.delete(borrower)
-                session.commit()
+                self.session.delete(borrower)
+                self.session.commit()
                 print("Borrower deleted successfully!")
             else:
                 print("Borrower not found!")
@@ -199,9 +201,9 @@ class LibraryCLI:
             print(f"Error: {str(e)}")
 
 
-    def view_all_borrowers(session):
+    def view_all_borrowers(self):
         """Display all borrowers."""
-        borrowers = session.query(Borrower).all()
+        borrowers = self.session.query(Borrower).all()
         if borrowers:
             for borrower in borrowers:
                 print(f"ID: {borrower.id}, Name: {borrower.name}, Email: {borrower.email}, Phone: {borrower.phone or 'None'}")
@@ -209,10 +211,10 @@ class LibraryCLI:
             print("No borrowers found.")
 
 
-    def find_borrower(session):
+    def find_borrower(self):
         """Find a borrower by name or email."""
         search = input("Name or email: ")
-        borrowers = session.query(Borrower).filter((Borrower.name.ilike(f"%{search}%")) | (Borrower.email == search)).all()
+        borrowers = self.session.query(Borrower).filter((Borrower.name.ilike(f"%{search}%")) | (Borrower.email == search)).all()
         if borrowers:
             for borrower in borrowers:
                 print(f"ID: {borrower.id}, Name: {borrower.name}, Email: {borrower.email}, Phone: {borrower.phone or 'None'}")

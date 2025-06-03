@@ -1,7 +1,7 @@
 #Data models and validation logic
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, MetaData
-from sqlalchemy.orm import relationship, validates, declarative_base
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, MetaData, create_engine
+from sqlalchemy.orm import relationship, validates, declarative_base, sessionmaker
 #from models import Base
 import re
 from datetime import datetime
@@ -15,11 +15,21 @@ convention = {
     "ck": "ck_%(table_name)s_%(constraint_name)s",
 }
 
-# Create metadata with naming convention
-metadata = MetaData(naming_convention=convention)
+# # Create metadata with naming convention
+# metadata = MetaData(naming_convention=convention)
 
-# Create the base class for declarative models
-Base = declarative_base(metadata=metadata)
+# # Create the base class for declarative models
+# Base = declarative_base(metadata=metadata)
+
+Base = declarative_base()
+engine = create_engine("sqlite:///library.db", echo=False)
+Session = sessionmaker(bind=engine)
+
+def init_db():
+    Base.metadata.create_all(engine)
+
+def get_session():
+    return Session()
 
 class Book(Base):
     __tablename__ = "books"
@@ -103,3 +113,9 @@ class Borrower(Base):
         return f"<Borrower(name='{self.name}', email='{self.email}')>"
 
 
+# Database engine and session factory
+engine = create_engine("sqlite:///library.db")
+Session = sessionmaker(bind=engine)
+
+def get_session():
+    return Session()
