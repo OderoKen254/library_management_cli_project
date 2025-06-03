@@ -1,5 +1,6 @@
 #CLI Interface and Menu Logic
 
+from sqlalchemy import or_
 from lib.db.models import Book, Borrower, init_db, get_session
 from sqlalchemy.exc import IntegrityError
 
@@ -132,16 +133,7 @@ class CLI:
         else:
             print("No books found.")
 
-    # def find_book(self):
-    #     """Find a book by title or ISBN."""
-    #     search = input("Enter title or ISBN: ")
-    #     books = self.session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
-    #     if books:
-    #         for book in books:
-    #             borrower = book.borrower.name if book.borrower else "None"
-    #             print(f"ID: {book.id}, Title: {book.title}, Author: {book.author}, ISBN: {book.isbn}, Year: {book.publication_year}, Borrower: {borrower}")
-    #     else:
-    #         print("No books found.")
+    
     def find_books(self):
         try:
             search_term = input("Enter title or ISBN to search: ").strip()
