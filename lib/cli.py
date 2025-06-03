@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 class CLI:
     def __init__(self):
-        #init_db()  # Initialize the database when the CLI starts
+      # Initialize the database when the CLI starts
         self.session = get_session()
 
     def main_menu(self):
@@ -31,7 +31,6 @@ class CLI:
 
     def book_menu(self):
         """Display book management sub-menu."""
-       # session = Session()
         while True:
             print("\n......Book Management.......")
             print("1. Add Book")
@@ -49,7 +48,7 @@ class CLI:
             elif choice == '3':
                 self.view_all_books()
             elif choice == '4':
-                self.vself.iew_borrowed_book()
+                self.view_borrowed_books()
             elif choice == '5':
                 self.find_books()
             elif choice == '6':
@@ -57,12 +56,10 @@ class CLI:
                 break
             else:
                 print("Invalid choice entry. Please try again.")
-        #session.close()
 
 
     def borrower_menu(self):
         """Display borrower management sub-menu."""
-       # session = Session()
         while True:
             print("\n======Borrower Management======")
             print("1. Add Borrower")
@@ -84,7 +81,6 @@ class CLI:
                 break
             else:
                 print("Invalid choice entry. Please try again.")
-        #session.close()
 
 
     # Book handling functions
@@ -136,16 +132,48 @@ class CLI:
         else:
             print("No books found.")
 
-    def find_book(self):
-        """Find a book by title or ISBN."""
-        search = input("Enter title or ISBN: ")
-        books = self.session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
-        if books:
+    # def find_book(self):
+    #     """Find a book by title or ISBN."""
+    #     search = input("Enter title or ISBN: ")
+    #     books = self.session.query(Book).filter((Book.title.ilike(f"%{search}%")) | (Book.isbn == search)).all()
+    #     if books:
+    #         for book in books:
+    #             borrower = book.borrower.name if book.borrower else "None"
+    #             print(f"ID: {book.id}, Title: {book.title}, Author: {book.author}, ISBN: {book.isbn}, Year: {book.publication_year}, Borrower: {borrower}")
+    #     else:
+    #         print("No books found.")
+    def find_books(self):
+        try:
+            search_term = input("Enter title or ISBN to search: ").strip()
+            if not search_term:
+                print("Search term cannot be empty.")
+                return
+
+            # Query books by title or ISBN (case-insensitive for title)
+            books = self.session.query(Book).filter(
+                or_(
+                    Book.title.ilike(f"%{search_term}%"),
+                    Book.isbn == search_term
+                )
+            ).all()
+
+            if not books:
+                print("No books found matching the search term.")
+                return
+
+            print("\nFound Books:")
             for book in books:
-                borrower = book.borrower.name if book.borrower else "None"
-                print(f"ID: {book.id}, Title: {book.title}, Author: {book.author}, ISBN: {book.isbn}, Year: {book.publication_year}, Borrower: {borrower}")
-        else:
-            print("No books found.")
+                borrower_info = (
+                    f"Borrowed by: {book.borrower.name} (ID: {book.borrower_id})"
+                    if book.borrower_id and book.borrower
+                    else "Not borrowed"
+                )
+                print(
+                    f"ID: {book.id}, Title: {book.title}, Author: {book.author}, "
+                    f"ISBN: {book.isbn}, Year: {book.publication_year}, {borrower_info}"
+                )
+        except Exception as e:
+            print(f"Error searching books: {e}")
 
 
     def view_borrowed_books(self):
