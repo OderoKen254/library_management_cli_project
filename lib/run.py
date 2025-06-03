@@ -1,7 +1,7 @@
 #Main Entry Point
 
 from database import init_db
-from cli import LibraryCLI
+from lib.cli import LibraryCLI
 
 def main():
     """Initialize database and start CLI."""

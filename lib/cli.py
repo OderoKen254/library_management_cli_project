@@ -1,7 +1,7 @@
 #CLI Interface and Menu Logic
 
-from database import Session
-from models import Book, Borrower
+from lib.database import Session
+from lib.db.models import Book, Borrower
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 class LibraryCLI:
