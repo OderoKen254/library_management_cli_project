@@ -1,16 +1,20 @@
 #Data models and validation logic
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, MetaData
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import relationship, validates, declarative_base
 from database import Base
 import re
 from datetime import datetime
 
+# Naming convention for foreign keys
 convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 }
+
+# Create metadata with naming convention
 metadata = MetaData(naming_convention=convention)
 
+# Create the base class for declarative models
 Base = declarative_base(metadata=metadata)
 
 class Book(Base):
